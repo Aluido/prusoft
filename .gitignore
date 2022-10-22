@@ -127,3 +127,4 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+presentacion1/media/upload/
