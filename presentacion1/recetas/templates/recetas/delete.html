@@ -1,0 +1,11 @@
+<h1>Crear Receta</h1>
+<form action="{% url 'delete' receta.pk %}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form}}
+    Seguro de eliminar?
+    <br><br>
+    {{ receta.title}}
+    <br><br>
+    <button class="button" type="submit">Eliminar</button>
+    <a href="{% url 'index' %}">Cancelar</a>
+</form>

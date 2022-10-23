@@ -2,7 +2,10 @@
     <ul>
     {% for receta in recetas_list %}
         <li><a href="/recetas/{{ receta.id }}/">{{ receta.titulo }}</a></li>
+        <a href="{% url 'edit' receta.id  %}">Editar</a>
+        <a href="{% url 'delete' receta.id %}">Eliminar</a>
     {% endfor %}
+    <a href="{% url 'create'%}">Crear</a>
     </ul>
 {% else %}
     <p>No hay recetas.</p>
