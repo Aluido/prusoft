@@ -1,6 +1,4 @@
 from django.shortcuts import render, get_object_or_404, redirect
-
-from django.views.generic import DetailView
 from .models import Receta
 from .forms import RecetaForm, RecetaDeleteForm
 # Create your views here.
@@ -21,9 +19,8 @@ def detail(request,receta_id):
 def create(request):
 	if request.method == 'POST':
 		form = RecetaForm(request.POST,request.FILES)
-		print(form)
 		if form.is_valid():
-			print('TEEE')
+			print('Forma valida')
 			form.imagen = request.FILES['imagen']
 			form.save()
 			return redirect('create')
