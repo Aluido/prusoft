@@ -1,4 +1,5 @@
 from django.test import TestCase, Client
+from  django.middleware.csrf import get_token
 from recetas.models import Receta
 
 # Create your tests here.
@@ -16,13 +17,16 @@ class RecetasTestCase(TestCase):
 	def test_create(self):
 		with open('testImage.jpeg', 'rb') as testImage:
 			response = self.client.post('/recetas/create/', {
+				'csrfmiddlewaretoken': ['testToken'],
 				'titulo': ['TituloPrueba'],
 				'detalle': ['DetallePrueba'],
 				'ingredientes': ['IngredientesPrueba'],
 				'imagen': testImage
 			})
-			print(response.status_code)
-			# TODO: arreglar
+
+		response = self.client.get('/recetas/')
+		print(response.content)
+		# TODO: cambiar este print a un output mas lindo
 
 	# Prueba de visualización de Recetas
 	def test_index(self):
