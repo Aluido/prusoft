@@ -1,6 +1,7 @@
 from django.test import TestCase, Client
 from  django.middleware.csrf import get_token
 from recetas.models import Receta
+import hashlib
 
 # Create your tests here.
 # The tests are run with >./manage.py test --keepdb
@@ -38,12 +39,21 @@ class RecetasTestCase(TestCase):
 			return False
 		else:
 			print('Ejecución consulta GET de las Recetas almacenadas....')
+			ret_val = True
 			response = self.client.get('/recetas/')
 			print('Respuesta del servidor:')
 			print('HTTP status_code:', response.status_code)
+			if response.status_code != 200:
+				print('No se recibió una respuesta HTTP 200')
+				ret_val = False
 			print('HTML:', response.content)
+			html_hash = hashlib.md5(response.content).hexdigest()
+			print('MD5 Hash:', html_hash)
+			if html_hash != 'b7342e1042745217b030679bc3e9ef88':
+				print('El hash MD5 del archivo HTML no es el esperado.')
+				ret_val = False               
 			print('===FIN PRUEBA DE CREACIÓN DE RECETAS===\n')
-			return True
+			return ret_val
 
 	# Prueba de visualización de Recetas
 	def test_index(self):
