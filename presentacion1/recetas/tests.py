@@ -34,6 +34,7 @@ class RecetasTestCase(TestCase):
 			})
 		if (response.status_code != 302):
 			print('Error al añadir la receta de prueba.')
+			print('===FIN PRUEBA DE CREACIÓN DE RECETAS===\n')
 			return False
 		else:
 			print('Ejecución consulta GET de las Recetas almacenadas....')
@@ -41,8 +42,8 @@ class RecetasTestCase(TestCase):
 			print('Respuesta del servidor:')
 			print('HTTP status_code:', response.status_code)
 			print('HTML:', response.content)
-		print('===FIN PRUEBA DE CREACIÓN DE RECETAS===\n')
-		return True
+			print('===FIN PRUEBA DE CREACIÓN DE RECETAS===\n')
+			return True
 
 	# Prueba de visualización de Recetas
 	def test_index(self):
@@ -83,5 +84,23 @@ class RecetasTestCase(TestCase):
 	# Prueba de eliminación de Recetas
 	def test_delete(self): # Alberto: No comprendo si "borrar info" se refiere a eliminar una receta o sus detalles
 		print('===INICIO PRUEBA DE ELIMINACIÓN DE RECETAS===')
-		print('===FIN PRUEBA DE ELIMINACIÓN DE RECETAS===\n')
-		return True
+		print('Ejecución consulta POST para eliminar: Pie con Queso....')
+		with open('testImage.jpeg', 'rb') as testImage:
+			print('Receta eliminada por POST: Pie con Queso....')
+			response = self.client.post('/recetas/delete/1', {
+				'titulo': ['Pie con Queso'],
+				'detalle': ['- Haz un pie\n- Ponle Queso\n- A comer!'],
+				'ingredientes': ['- Pie\n- Queso'],
+				'imagen': testImage
+			})
+		response = self.client.get('/recetas/')
+		if(response.status_code != 200):
+			print('Error al eliminar.')
+			print('===FIN PRUEBA DE ELIMINACIÓN DE RECETAS===\n')
+			return False
+		else:
+			print('Respuesta del servidor:')
+			print('HTTP status_code:', response.status_code)
+			print('HTML:', response.content)
+			print('===FIN PRUEBA DE ELIMINACIÓN DE RECETAS===\n')
+			return True
