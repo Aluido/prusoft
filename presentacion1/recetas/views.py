@@ -20,7 +20,7 @@ def create(request):
 	if request.method == 'POST':
 		form = RecetaForm(request.POST,request.FILES)
 		if form.is_valid():
-			print('Forma valida')
+			# print('Forma valida')
 			form.imagen = request.FILES['imagen']
 			form.save()
 			return redirect('create')
