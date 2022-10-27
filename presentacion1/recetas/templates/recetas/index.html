@@ -1,12 +1,103 @@
-{% if recetas_list %}
-    <ul>
-    {% for receta in recetas_list %}
-        <li><a href="/recetas/{{ receta.id }}/">{{ receta.titulo }}</a></li>
-        <a href="{% url 'edit' receta.id  %}">Editar</a>
-        <a href="{% url 'delete' receta.id %}">Eliminar</a>
-    {% endfor %}
-    <a href="{% url 'create'%}">Crear</a>
-    </ul>
-{% else %}
-    <p>No hay recetas.</p>
-{% endif %}
+<html>
+    <head>
+        <title>Recetas</title>
+        <style type="text/css">
+            * {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Float four columns side by side */
+.column {
+  float: left;
+  width: 25%;
+  padding: 10 10px;
+}
+
+/* Remove extra left and right margins, due to padding in columns */
+.row {margin: 0 -5px;}
+
+/* Clear floats after the columns */
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* Style the counter cards */
+.card {
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2); /* this adds the "card" effect */
+  padding: 16px;
+  text-align: center;
+  background-color: #f1f1f1;
+}
+
+/* Responsive columns - one column layout (vertical) on small screens */
+@media screen and (max-width: 600px) {
+  .column {
+    width: 100%;
+    display: block;
+    margin-bottom: 20px;
+  }
+}
+.titulo {
+    height: 150px;
+    margin-top: 30px;
+}
+
+.fcc-btn {
+  background-color: #199319;
+  color: white;
+  padding: 15px 25px;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+}
+a {
+  color: #000;
+  text-decoration: none;
+  position: relative;
+  font-weight: bold;
+}
+
+        </style>
+    </head>
+    <body>
+        <div class="container">
+        {% if recetas_list %}
+        <div class="row">
+            <ul>
+            {% for receta in recetas_list %}
+                <div class="column">
+                    <div class="card">
+
+                        <div>
+                            <a href="/{{ receta.id }}/">
+                                <img src={{receta.imagen.url}}
+                                width="200" height="150">
+                             </a>
+                        </div>
+                        <div class="titulo" >
+                            <a  href="/{{ receta.id }}/">{{ receta.titulo }}</a>
+                        </div>
+                        <div>
+                            <a class="fcc-btn" href="{% url 'edit' receta.id  %}">Editar</a>  
+                            <a class="fcc-btn" href="{% url 'delete' receta.id  %}">Eliminar</a>  
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            </ul>
+        </div>
+        {% else %}
+            <p>No hay recetas.</p>
+        {% endif %}
+        <div style="margin-top: 100px; margin-left: 42px;">
+            <a class="fcc-btn" href="{% url 'create'%}">Crear</a>
+        </div>
+        </div>
+    </body>
+</html>

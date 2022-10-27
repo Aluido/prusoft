@@ -20,7 +20,7 @@ from presentacion1 import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('recetas/', include('recetas.urls')),
+    path('', include('recetas.urls')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
