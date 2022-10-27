@@ -62,11 +62,16 @@ class RecetasTestCase(TestCase):
 		print('Respuesta del servidor:')
 		print('HTTP status_code:', response.status_code)
 		print('HTML:', response.content)
+		ret_val = True
+		html_hash = hashlib.md5(response.content).hexdigest()
+		if html_hash != '047bb746e4cba5dd1c43a2ca2a8a4309':
+			print('El hash MD5 del archivo HTML no es el esperado.')
+			ret_val = False
 		print('===FIN PRUEBA DE VISUALIZACIÓN DE RECETAS===\n')
 		if(response.status_code != 200):
 			return False
 		else:
-			return True
+			return ret_val
 	
 	# Prueba de edición de Recetas
 	def test_edit(self):
@@ -79,6 +84,7 @@ class RecetasTestCase(TestCase):
 				'ingredientes': ['- Poderoso Pie\n- Ultra Queso'],
 				'imagen': testImage
 			})
+		ret_val = True
 		if (response.status_code != 302):
 			print('Error al editar la receta.')
 			return False
@@ -88,8 +94,12 @@ class RecetasTestCase(TestCase):
 			print('Respuesta del servidor:')
 			print('HTTP status_code:', response.status_code)
 			print('HTML:', response.content)
+			html_hash = hashlib.md5(response.content).hexdigest()
+			if html_hash != '06f157b84015e8e2dedcaf4763407fc0':
+				print('El hash MD5 del archivo HTML no es el esperado.')
+				ret_val = False
 		print('===FIN PRUEBA DE EDICIÓN DE RECETAS===\n')
-		return True
+		return ret_val
 	
 	# Prueba de eliminación de Recetas
 	def test_delete(self): # Alberto: No comprendo si "borrar info" se refiere a eliminar una receta o sus detalles
@@ -112,5 +122,10 @@ class RecetasTestCase(TestCase):
 			print('Respuesta del servidor:')
 			print('HTTP status_code:', response.status_code)
 			print('HTML:', response.content)
+			ret_val = True
+			html_hash = hashlib.md5(response.content).hexdigest()
+			if html_hash != '60533a55d4e64644d6261bf617bb1380':
+				print('El hash MD5 del archivo HTML no es el esperado.')
+				ret_val = False
 			print('===FIN PRUEBA DE ELIMINACIÓN DE RECETAS===\n')
 			return True
