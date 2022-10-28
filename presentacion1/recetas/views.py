@@ -1,6 +1,10 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Receta
 from .forms import RecetaForm, RecetaDeleteForm
+from django.http import JsonResponse
+
+last_item_id = 0
+
 # Create your views here.
 def index(request):
 	recetas_list = Receta.objects.all()
@@ -22,7 +26,8 @@ def create(request):
 		if form.is_valid():
 			# print('Forma valida')
 			form.imagen = request.FILES['imagen']
-			form.save()
+			last_item = form.save()
+			last_item_id = last_item.pk
 			return redirect('create')
 	else:
 		form = RecetaForm()
@@ -53,3 +58,7 @@ def delete(request, pk=None):
 	else:
 		form = RecetaDeleteForm(instance=receta)
 	return render(request, 'recetas/delete.html',{'form': form, 'receta': receta})
+
+def get_last_id(request):
+	if request.method == 'GET':
+		return JsonResponse({'id': last_item_id})
