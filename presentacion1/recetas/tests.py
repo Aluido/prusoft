@@ -139,14 +139,30 @@ class RecetasTestCase(TestCase):
 
 	def test_all(self):
 		ret_val = True
+		create_status = "[SUCCESS]"
+		edit_status = "[SUCCESS]"
+		index_status = "[SUCCESS]"
+		delete_status = "[SUCCESS]"
 		if not self.Test_create():
 			ret_val = False
+			create_status = "[FAILED]"
+			print("FAILED CREATION TEST")
 		if not self.Test_edit():
+			edit_status = "[FAILED]"
 			ret_val = False
+			print("FAILED EDIT TEST")
 		if not self.Test_index():
+			index_status = "[FAILED]"
 			ret_val = False
+			print("FAILED READ TEST")
 		if not self.Test_delete():
+			delete_status = "[FAILED]"
 			ret_val = False
-
+			print("FAILED DELETE TEST")
+		if ret_val:
+			print("CREATION TEST\t\t\t " + create_status)
+			print("EDIT TEST\t\t\t " + edit_status)
+			print("READ TEST\t\t\t " + index_status)
+			print("DELETE TEST\t\t\t " + delete_status)
 
 		return ret_val
