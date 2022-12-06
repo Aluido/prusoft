@@ -1,4 +1,4 @@
-# Pruebas de Software Presentación 1: Testing en Django2
+# Pruebas de Software Presentación 1: Testing en Django
 
 ## Ejecución
 Para poder ejecutar el servidor ocupe los siguientes comandos:
