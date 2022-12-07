@@ -1,13 +1,14 @@
 import os
 
-from django.test import TestCase
+#from django.test import TestCase
+import unittest
 
 from selenium import webdriver
 from selenium.webdriver import FirefoxOptions
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 
-class RecetaSeleniumTest(TestCase):
+class RecetaSeleniumTest(unittest.TestCase):
     def setUp(self):
         opts = FirefoxOptions()
         opts.add_argument("--headless")
