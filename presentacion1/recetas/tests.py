@@ -17,7 +17,7 @@ class RecetaSeleniumTest(unittest.TestCase):
     def tearDown(self):
         self.driver.quit()
 
-    def Test_create(self):
+    def test_1create(self):
         driver = self.driver
         driver.get("http://127.0.0.1:8000")
         create_button = driver.find_element(By.LINK_TEXT, "Crear")
@@ -45,7 +45,7 @@ class RecetaSeleniumTest(unittest.TestCase):
             return False
         return True
 
-    def Test_index(self):
+    def test_2index(self):
         driver = self.driver
         driver.get("http://127.0.0.1:8000")
         post_button = driver.find_element(By.LINK_TEXT, "Prueba Sel")
@@ -61,7 +61,7 @@ class RecetaSeleniumTest(unittest.TestCase):
             return False
         return True
 
-    def Test_edit(self):
+    def test_3edit(self):
         driver = self.driver
         driver.get("http://127.0.0.1:8000")
         post_button = driver.find_elements(By.LINK_TEXT, "Editar")[-1]
@@ -86,7 +86,7 @@ class RecetaSeleniumTest(unittest.TestCase):
             return False
         return True
 
-    def Test_delete(self):
+    def test_4delete(self):
         driver = self.driver
         driver.get("http://127.0.0.1:8000")
         post_button = driver.find_elements(By.LINK_TEXT, "Eliminar")[-1]
@@ -105,7 +105,7 @@ class RecetaSeleniumTest(unittest.TestCase):
             return True
         return False
 
-    def test_all(self):
+    def Test_all(self):
         ret_val = True
         create_status = "[SUCCESS]"
         index_status = "[SUCCESS]"
