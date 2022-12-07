@@ -1,168 +1,139 @@
-from django.test import TestCase, Client
-from  django.middleware.csrf import get_token
-from recetas.models import Receta
-from json import loads
-import hashlib
-import re
+import os
 
-# Create your tests here.
-# The tests are run with >./manage.py test --keepdb
+from django.test import TestCase
 
-class RecetasTestCase(TestCase):
-	# Cliente para ejecutar consultas a la pagina
-	client = Client()
-	
-	# Carga de datos previo a la prueba en caso de ser necesario
-	def setUp(self):
-		print("===DATOS PRE-INGRESADOS PARA LA PRUEBA===")
-		with open('testImage.jpeg', 'rb') as testImage:
-			self.client.post('/create/', {
-				'titulo': ['Pie con Queso'],
-				'detalle': ['- Haz un pie\n- Ponle Queso\n- A comer!'],
-				'ingredientes': ['- Pie\n- Queso'],
-				'imagen': testImage
-			})
-		print('- Pie con Queso')
-	
-	# Prueba de creacion de Recetas
-	def Test_create(self):
-		print('===INICIO PRUEBA DE CREACIÓN DE RECETAS===')
-		with open('testImage.jpeg', 'rb') as testImage:
-			print('Nueva receta añadida por POST: Bistec a lo prueba....')
-			response = self.client.post('/create/', {
-				'titulo': ['Bistec a lo prueba'],
-				'detalle': ['- Tome un bistec\n- Paselo por unit testing\n- A comer!'],
-				'ingredientes': ['- Bistec\n- Unit testing'],
-				'imagen': testImage
-			})
-		if (response.status_code != 302):
-			print('Error al añadir la receta de prueba.')
-			print('===FIN PRUEBA DE CREACIÓN DE RECETAS===\n')
-			return False
-		else:
-			print('Ejecución consulta GET de las Recetas almacenadas....')
-			ret_val = True
-			response = self.client.get('/')
-			print('Respuesta del servidor:')
-			print('HTTP status_code:', response.status_code)
-			if response.status_code != 200:
-				print('No se recibió una respuesta HTTP 200')
-				ret_val = False
-                
-			re_html = re.sub(r'testImage_.*\.jpeg', 'testImage.jpeg', response.content.decode())
-			print('HTML:', re_html)
-			html_hash = hashlib.md5(str.encode(re_html)).hexdigest()
-			print('MD5 Hash:', html_hash)
-			if html_hash != '1d00d86c268621be079dc9391c78c039':
-				print('El hash MD5 del archivo HTML no es el esperado. Recibido:', html_hash)
-				ret_val = False               
-			print('===FIN PRUEBA DE CREACIÓN DE RECETAS===\n')
-			return ret_val
+from selenium import webdriver
+from selenium.webdriver import FirefoxOptions
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
 
-	# Prueba de visualización de Recetas
-	def Test_index(self):
-		print('===INICIO PRUEBA DE VISUALIZACIÓN DE RECETAS===')
-		response = self.client.get(f'/1/')
-		print('Respuesta del servidor:')
-		print('HTTP status_code:', response.status_code)
-		ret_val = True
-		re_html = re.sub(r'testImage_.*\.jpeg', 'testImage.jpeg', response.content.decode())
-		print('HTML:', re_html)
-		html_hash = hashlib.md5(str.encode(re_html)).hexdigest()
-		if html_hash != '576649721accc00feb1e750d27557797':
-			print('El hash MD5 del archivo HTML no es el esperado. Recibido:', html_hash)
-			ret_val = False
-		print('===FIN PRUEBA DE VISUALIZACIÓN DE RECETAS===\n')
-		if(response.status_code != 200):
-			return False
-		else:
-			return ret_val
-	
-	# Prueba de edición de Recetas
-	def Test_edit(self):
-		print('===INICIO PRUEBA DE EDICIÓN DE RECETAS===')
-		with open('testImage.jpeg', 'rb') as testImage:
-			print('Receta modificada por POST: Pie con Queso....')
-			response = self.client.post(f'/edit/1', {
-				'titulo': ['Pie con Ultra Queso'],
-				'detalle': ['- Haz un super pie\n- Ponle aún más queso\n- A recontra comer!'],
-				'ingredientes': ['- Poderoso Pie\n- Ultra Queso'],
-				'imagen': testImage
-			})
-		ret_val = True
-		if (response.status_code != 302):
-			print('Error al editar la receta.')
-			return False
-		else:
-			print('Ejecución consulta GET de la Receta modificada....')
-			response = self.client.get('/1/')
-			print('Respuesta del servidor:')
-			print('HTTP status_code:', response.status_code)
-			re_html = re.sub(r'testImage_.*\.jpeg', 'testImage.jpeg', response.content.decode())
-			print('HTML:', re_html)
-			html_hash = hashlib.md5(str.encode(re_html)).hexdigest()
-			if html_hash != '576649721accc00feb1e750d27557797':
-				print('El hash MD5 del archivo HTML no es el esperado. Recibido:', html_hash)
-				ret_val = False
-		print('===FIN PRUEBA DE EDICIÓN DE RECETAS===\n')
-		return ret_val
-	
-	# Prueba de eliminación de Recetas
-	def Test_delete(self): # Alberto: No comprendo si "borrar info" se refiere a eliminar una receta o sus detalles
-		print('===INICIO PRUEBA DE ELIMINACIÓN DE RECETAS===')
-		print('Ejecución consulta POST para eliminar: Pie con Queso....')
-		with open('testImage.jpeg', 'rb') as testImage:
-			print('Receta eliminada por POST: Pie con Queso....')
-			response = self.client.post(f'/delete/1', {
-				'titulo': ['Pie con Queso'],
-				'detalle': ['- Haz un pie\n- Ponle Queso\n- A comer!'],
-				'ingredientes': ['- Pie\n- Queso'],
-				'imagen': testImage
-			})
-		response = self.client.get('/')
-		if(response.status_code != 200):
-			print('Error al eliminar.')
-			print('===FIN PRUEBA DE ELIMINACIÓN DE RECETAS===\n')
-			return False
-		else:
-			print('Respuesta del servidor:')
-			print('HTTP status_code:', response.status_code)
-			re_html = re.sub(r'testImage_.*\.jpeg', 'testImage.jpeg', response.content.decode())
-			print('HTML:', re_html)
-			ret_val = True
-			html_hash = hashlib.md5(str.encode(re_html)).hexdigest()
-			if html_hash != '3b31c0ae732ef2e717115754694bd1e9':
-				print('El hash MD5 del archivo HTML no es el esperado. Recibido:', html_hash)
-				ret_val = False
-			print('===FIN PRUEBA DE ELIMINACIÓN DE RECETAS===\n')
-			return True
+class RecetaSeleniumTest(TestCase):
+    def setUp(self):
+        opts = FirefoxOptions()
+        opts.add_argument("--headless")
+        self.driver = webdriver.Firefox(options=opts)
 
-	def test_all(self):
-		ret_val = True
-		create_status = "[SUCCESS]"
-		edit_status = "[SUCCESS]"
-		index_status = "[SUCCESS]"
-		delete_status = "[SUCCESS]"
-		if not self.Test_create():
-			ret_val = False
-			create_status = "[FAILED]"
-			print("FAILED CREATION TEST")
-		if not self.Test_edit():
-			edit_status = "[FAILED]"
-			ret_val = False
-			print("FAILED EDIT TEST")
-		if not self.Test_index():
-			index_status = "[FAILED]"
-			ret_val = False
-			print("FAILED READ TEST")
-		if not self.Test_delete():
-			delete_status = "[FAILED]"
-			ret_val = False
-			print("FAILED DELETE TEST")
-		if ret_val:
-			print("CREATION TEST\t\t\t " + create_status)
-			print("EDIT TEST\t\t\t " + edit_status)
-			print("READ TEST\t\t\t " + index_status)
-			print("DELETE TEST\t\t\t " + delete_status)
+    def tearDown(self):
+        self.driver.quit()
 
-		return ret_val
+    def Test_create(self):
+        driver = self.driver
+        driver.get("http://127.0.0.1:8000")
+        create_button = driver.find_element(By.LINK_TEXT, "Crear")
+        create_button.click()
+
+        #New recipe page
+        title_box = driver.find_element(By.ID, "id_titulo")
+        detalle_box = driver.find_element(By.ID, "id_detalle")
+        ingredientes_box = driver.find_element(By.ID, "id_ingredientes")
+        imagen_box = driver.find_element(By.ID, "id_imagen")
+        title_box.send_keys("Prueba Sel")
+        detalle_box.send_keys("Esta es una prueba utilizando Selenium.\nLorem ipsum dolor sit amet.")
+        ingredientes_box.send_keys("-Lorem\n-Ipsum\n-Dolor (250 gr.)\n-Sit\n-Amet (1 tbsp)")
+
+        image_abs_path = os.path.abspath("./testImage.jpeg")        
+        imagen_box.send_keys(image_abs_path)
+
+        send_button = driver.find_element(By.CSS_SELECTOR, "input.btn.btn-primary")
+        send_button.click()
+
+        driver.get("http://127.0.0.1:8000")
+        try:
+            recipe_title = driver.find_element(By.LINK_TEXT, "Prueba Sel")
+        except:
+            return False
+        return True
+
+    def Test_index(self):
+        driver = self.driver
+        driver.get("http://127.0.0.1:8000")
+        post_button = driver.find_element(By.LINK_TEXT, "Prueba Sel")
+        post_button.click()
+
+        #Selenium recipe page
+        title_text = driver.find_element(By.CSS_SELECTOR, "h1").text
+        content_objects = driver.find_elements(By.CSS_SELECTOR, "p")
+        detalle_text = content_objects[1].text
+        ingredientes_text = content_objects[0].text
+
+        if title_text != "Prueba Sel" or "-Lorem" not in ingredientes_text or "Esta" not in detalle_text:
+            return False
+        return True
+
+    def Test_edit(self):
+        driver = self.driver
+        driver.get("http://127.0.0.1:8000")
+        post_button = driver.find_elements(By.LINK_TEXT, "Editar")[-1]
+        post_button.click()
+
+        #Selenium edit page
+        title_box = driver.find_element(By.ID, "id_titulo")
+        detalle_box = driver.find_element(By.ID, "id_detalle")
+        ingredientes_box = driver.find_element(By.ID, "id_ingredientes")
+        imagen_box = driver.find_element(By.ID, "id_imagen")
+        title_box.send_keys(" 2")
+        detalle_box.send_keys("\nY esta es la continuacion de la prueba.")
+        ingredientes_box.send_keys("\n-Prueba (14 ml)")
+
+        send_button = driver.find_element(By.CSS_SELECTOR, "input.btn.btn-primary")
+        send_button.click()
+
+        driver.get("http://127.0.0.1:8000")
+        try:
+            recipe_title = driver.find_element(By.LINK_TEXT, "Prueba Sel 2")
+        except:
+            return False
+        return True
+
+    def Test_delete(self):
+        driver = self.driver
+        driver.get("http://127.0.0.1:8000")
+        post_button = driver.find_elements(By.LINK_TEXT, "Eliminar")[-1]
+        post_button.click()
+
+        #Selenium delete page
+        delete_button = driver.find_element(By.CSS_SELECTOR, "button.fcc-btn")
+        delete_button.click()
+
+        if driver.current_url != "http://127.0.0.1:8000/":
+            print(driver.current_url)
+            return False
+        try:
+            recipe_title = driver.find_element(By.LINK_TEXT, "Prueba Sel 2")
+        except:
+            return True
+        return False
+
+    def test_all(self):
+        ret_val = True
+        create_status = "[SUCCESS]"
+        index_status = "[SUCCESS]"
+        edit_status = "[SUCCESS]"
+        delete_status = "[SUCCESS]"
+        if not self.Test_create():
+            ret_val = False
+            create_status = "[FAILED]"
+            print("FAILED CREATION TEST")
+        if not self.Test_index():
+            ret_val = False
+            index_status = "[FAILED]"
+            print("FAILED INDEX TEST")
+        if not self.Test_edit():
+            ret_val = False
+            edit_status = "[FAILED]"
+            print("FAILED EDIT TEST")
+        if not self.Test_delete():
+            ret_val = False
+            delete_status = "[FAILED]"
+            print("FAILED DELETE TEST")
+        print("CREATION TEST\t\t\t " + create_status)
+        print("INDEX TEST\t\t\t " + index_status)
+        print("EDIT TEST\t\t\t " + edit_status)
+        print("DELETE TEST\t\t\t " + delete_status)
+        return ret_val
+
+if __name__ == "__main__":
+    rst = RecetaSeleniumTest()
+    rst.setUp()
+    rst.test_all()
+    rst.tearDown()
